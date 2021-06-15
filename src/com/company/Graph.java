@@ -106,14 +106,18 @@ public class Graph {
      */
     public boolean deleteNode(int node_id){
         Node nodeToDelete = graphHashTable.get(node_id);
-        int removedWeight = nodeToDelete.weight;
-        adjencyNode adjency = nodeToDelete.nodeAdjencies;
-        while (adjency != null){
-            int neigbour_id = adjency.connection_id;
-            Node neighbour = graphHashTable.get(neigbour_id);
-            weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
-            neighbour.removeAdj(node_id);
+        if (nodeToDelete != null) {
+            int removedWeight = nodeToDelete.weight;
+            adjencyNode adjency = nodeToDelete.nodeAdjencies;
+            while (adjency != null) {
+                int neigbour_id = adjency.connection_id;
+                Node neighbour = graphHashTable.get(neigbour_id);
+                weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
+                neighbour.removeAdj(node_id);
+            }
+            return true;
         }
+        return false;
     }
     
     /**
