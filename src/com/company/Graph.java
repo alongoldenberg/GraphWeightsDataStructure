@@ -33,7 +33,6 @@ public class Graph {
       numNodes = nodes.length;
       this.graphHashTable = new HashTable(nodes);
       weightHeap = new WeightHeap(parseInputNodesForHeap(nodes));
-    
     }
     
     public Node[] parseInputNodesForHeap(Node[] nodes) {
@@ -106,8 +105,15 @@ public class Graph {
      * @return returns 'true' if the function deleted a node, otherwise returns 'false'
      */
     public boolean deleteNode(int node_id){
-        //TODO: implement this method.
-        return false;
+        Node nodeToDelete = graphHashTable.get(node_id);
+        int removedWeight = nodeToDelete.weight;
+        adjencyNode adjency = nodeToDelete.nodeAdjencies;
+        while (adjency != null){
+            int neigbour_id = adjency.connection_id;
+            Node neighbour = graphHashTable.get(neigbour_id);
+            weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
+            neighbour.removeAdj(node_id);
+        }
     }
     
     /**
@@ -130,7 +136,6 @@ public class Graph {
      * This class represents a node in the graph.
      */
     public static class Node{
-
         /**
          * Creates a new node object, given its id and its weight.
          * @param id - the id of the node.
@@ -141,6 +146,7 @@ public class Graph {
     	int neighborhood_weight;
     	int heapPointer;
     	public adjencyNode nodeAdjencies;
+
     	
         public Node(int id, int weight, int neighborhood_weight, int heapPointer, adjencyNode nodeAdjencies){
             this.id = id;
@@ -205,6 +211,21 @@ public class Graph {
 
         public void setWeight(int weight) {
             this.weight = weight;
+        }
+
+        public void removeAdj(int adjToRemove){
+            adjencyNode adjency = this.nodeAdjencies;
+            if (adjency != null && adjency.connection_id == adjToRemove){
+                this.nodeAdjencies = adjency.next;
+                nodeAdjencies.next.prev = null;
+            }
+            adjency = adjency.next;
+            while(nodeAdjencies != null){
+                if(adjency.connection_id == adjToRemove){
+                    adjency.prev.next = adjency.next;
+                    adjency.next.prev = adjency.prev;
+                }
+            }
         }
 
     }
@@ -311,9 +332,14 @@ public class Graph {
         }
 
     }
-    
 
 
+
+    /**
+     * @author alongold
+     * This Class represents node adjency in a linked list format.
+     *
+     */
 
     public static class adjencyNode{
         private int connection_id;
@@ -449,8 +475,5 @@ public class Graph {
         	}
         }
     }
-    	
-    	
-   
 
 }
