@@ -16,7 +16,11 @@ public class Graph {
 
     private HashTable graphHashTable;
     private WeightHeap weightHeap;
+<<<<<<< Updated upstream
     private AdjacencyList adjacencyList;
+=======
+    private int numEdges, numNodes;
+>>>>>>> Stashed changes
 
 
     /**
@@ -26,9 +30,15 @@ public class Graph {
      * @param nodes - an array of node objects
      */
     public Graph(Node [] nodes){
+<<<<<<< Updated upstream
     	Node[] heapNodes = parseInputNodesForHeap(nodes);
     	weightHeap = new WeightHeap(heapNodes);
     	
+=======
+      this.numNodes = nodes.length;
+      this.graphHashTable = new HashTable(nodes);
+      this.weightHeap = new WeightHeap(parseInputNodesForHeap(nodes));
+>>>>>>> Stashed changes
     }
     
     public Node[] parseInputNodesForHeap(Node[] nodes) {
@@ -47,8 +57,12 @@ public class Graph {
      * @return a Node object representing the correct node. If there is no node in the graph, returns 'null'.
      */
     public Node maxNeighborhoodWeight(){
+<<<<<<< Updated upstream
         //TODO: implement this method.
         return null;
+=======
+        return this.weightHeap.getMax();
+>>>>>>> Stashed changes
     }
 
     /**
@@ -74,7 +88,20 @@ public class Graph {
      * @return returns 'true' if the function added an edge, otherwise returns 'false'.
      */
     public boolean addEdge(int node1_id, int node2_id){
-        //TODO: implement this method.
+        if (!graphHashTable.containKey(node1_id) || !graphHashTable.containKey(node1_id)) {
+        	return false;
+        }
+    	Node node_1 = graphHashTable.get(node1_id);
+        Node node_2 = graphHashTable.get(node2_id);
+
+        //Adjencies update:
+        node_1.addToAdjencies(node_2);
+        node_2.addToAdjencies(node_1);
+        
+        //Heap update:
+        this.weightHeap.additionKey(node_1.heapPointer, node_2.getWeight());
+        this.weightHeap.additionKey(node_2.heapPointer, node_1.getWeight());
+        
         return false;
     }
 
@@ -120,14 +147,37 @@ public class Graph {
     	int weight;
     	int neighborhood_weight;
     	int heapPointer;
+    	public adjencyNode nodeAdjencies;
     	
+        public Node(int id, int weight, int neighborhood_weight, int heapPointer, adjencyNode nodeAdjencies){
+            this.id = id;
+            this.weight = weight;
+            this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = heapPointer;
+            this.nodeAdjencies =  nodeAdjencies;
+        }
         public Node(int id, int weight, int neighborhood_weight, int heapPointer){
             this.id = id;
             this.weight = weight;
             this.neighborhood_weight = neighborhood_weight;
             this.heapPointer = heapPointer;
+            this.nodeAdjencies =  new adjencyNode(this); // initialize nodeAdjencies to be the node itself.
         }
-    	
+        
+        public Node(int id, int weight, int neighborhood_weight){
+            this.id = id;
+            this.weight = weight;
+            this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = 0; // no heap
+            this.nodeAdjencies =  new adjencyNode(this); // initialize nodeAdjencies to be the node itself.
+        }
+        
+        public void addToAdjencies(Node other) {
+        	adjencyNode otherToAdjNode = new adjencyNode(other);
+        	this.nodeAdjencies.addToStart(otherToAdjNode);
+        }
+        
+        
         public int getHeapPointer() {
             return this.heapPointer;
         }
@@ -161,9 +211,45 @@ public class Graph {
         }
     }
 
+    public static class adjencyNode{
+        private int connection_id;
+        private adjencyNode next;
+        private adjencyNode prev;
+        private adjencyNode connection;
+
+        public adjencyNode(int connection_id) {
+            this.connection_id = connection_id;
+        }
+        public adjencyNode(Node node) {
+            this.connection_id = node.id; 
+        }
+        
+        public adjencyNode getNext() {
+            return next;
+        }
+
+        public void setNext(adjencyNode next) {
+            this.next = next;
+        }
+
+        public adjencyNode getPrev() {
+            return prev;
+        }
+
+        public void setPrev(adjencyNode prev) {
+            this.prev = prev;
+        }
+        public void addToStart(adjencyNode adjNode) {
+        	adjNode.setNext(this);
+        	adjNode.setPrev(null);
+        	this.setPrev(adjNode);
+        }
+        
+    }
 
 
 
+<<<<<<< Updated upstream
 
 
     public class HashTable{
@@ -181,6 +267,56 @@ public class Graph {
             this.b = (int) (r.nextDouble() * p);
             for (Node node: graph){
                 insert(node);
+=======
+            private int hash(int node_id) {
+                return ((a * node_id + b) % p) % n;
+            }
+            
+            public void insert(Node node) {
+                HashCell hashcell = new HashCell(node);
+                int location = hash(node.getId());
+                if (hashTable[location] == null) {
+                    hashTable[location] = hashcell;
+                } else {
+                    HashCell collision = hashTable[location];
+                    while (collision.getNext() != null) {
+                        collision = collision.getNext();
+                    }
+                    collision.setNext(hashcell);
+                }
+            }
+
+            public boolean containKey(int i) {
+            	if (this.hashTable[i] == null) return false;
+            	else return true;
+            }
+            
+            public Node get(int node_id){
+                int location = hash(node_id);
+                if (hashTable[location] == null){return null;}
+                else{
+                    HashCell candidate = hashTable[location];
+                    while (candidate != null){
+                        if (candidate.getNode_id() == node_id){return candidate.node;}
+                        candidate = candidate.getNext();
+                    }
+                }
+                return null;
+            }
+            public void remove(int node_id){
+                int location = hash(node_id);
+                HashCell candidate = hashTable[location];
+                if (candidate == null){return;}
+                if (candidate.getNode_id() == node_id) {
+                    hashTable[location] = candidate.getNext();
+                    return;
+                }
+                while(candidate.getNext() != null){
+                    if(candidate.getNext().getNode_id() == node_id){
+                        candidate.setNext(candidate.getNext().getNext());
+                    }
+                }
+>>>>>>> Stashed changes
             }
         }
 
@@ -194,6 +330,7 @@ public class Graph {
     }
     
     private class HashCell{
+<<<<<<< Updated upstream
         public int node_id;
         public HeapNode heapPointer;
         public AdjacencyList nodeAdjencies;
@@ -203,6 +340,13 @@ public class Graph {
             this.node_id = node_id;
             this.heapPointer = heapPointer;
             this.nodeAdjencies =  nodeAdjencies;
+=======
+        public Node node;
+        public HashCell next;
+
+        public HashCell(Node node) {
+            this.node = node;
+>>>>>>> Stashed changes
         }
 
         public HashCell getNext() {
@@ -215,10 +359,13 @@ public class Graph {
     }
     
 
+<<<<<<< Updated upstream
     public class AdjacencyList{
 
     }
 
+=======
+>>>>>>> Stashed changes
     /**
      * 
      * @author ofirn
@@ -291,6 +438,10 @@ public class Graph {
         public void additionKey(int i, int weightToAdd) {
         	this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
         	HeapifyUp(i);
+        }
+        
+        public Node getMax() {
+        	return this.heapArray[1];
         }
         
         // @ pre -  size >= i > 0  &  size > 0
