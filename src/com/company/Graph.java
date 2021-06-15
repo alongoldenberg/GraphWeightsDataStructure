@@ -1,6 +1,8 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.Random;
+
 /*
 You must NOT change the signatures of classes/methods in this skeleton file.
 You are required to implement the methods of this skeleton file according to the requirements.
@@ -50,6 +52,7 @@ public class Graph {
      * @return a Node object representing the correct node. If there is no node in the graph, returns 'null'.
      */
     public Node maxNeighborhoodWeight(){
+    	if (graphHashTable.isEmpty()) return null;
         return this.weightHeap.getMax();
     }
 
@@ -90,6 +93,8 @@ public class Graph {
         //Heap update:
         this.weightHeap.additionKey(node_1.heapPointer, node_2.getWeight());
         this.weightHeap.additionKey(node_2.heapPointer, node_1.getWeight());
+        
+        this.numEdges++;
         
         return true;
     }
@@ -178,6 +183,9 @@ public class Graph {
         public void addToNeighborhoodWeight(int weightToAdd) {
         	this.neighborhood_weight += weightToAdd;
         }
+        public void reduceFromNeighborhoodWeight(int weightToReduce) {
+        	this.neighborhood_weight -= weightToReduce;
+        }
         
         /**
          * Returns the id of the node.
@@ -208,6 +216,7 @@ public class Graph {
             private int n;
             private int a;
             private int b;
+            private int fieldCells;
 
             public HashTable(Node[] graph) {
                 this.n = graph.length;
@@ -219,11 +228,15 @@ public class Graph {
                     insert(node);
                 }
             }
-
+            
             private int hash(int node_id) {
                 return ((a * node_id + b) % p) % n;
             }
-
+            
+            public boolean isEmpty() {
+            	return (this.fieldCells > 0);
+            }
+            
             public void insert(Node node) {
                 HashCell hashcell = new HashCell(node, null);
                 int location = hash(node.getId());
@@ -236,6 +249,7 @@ public class Graph {
                     }
                     collision.setNext(hashcell);
                 }
+                this.fieldCells++;
             }
             
             public boolean containKey(int i) {
@@ -268,6 +282,7 @@ public class Graph {
                         candidate.setNext(candidate.getNext().getNext());
                     }
                 }
+                this.fieldCells--;
             }
     }
 
@@ -412,6 +427,11 @@ public class Graph {
         public void additionKey(int i, int weightToAdd) {
         	this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
         	HeapifyUp(i);
+        }
+        
+        public void decreaseKey (int i, int weightToReduce) {
+        	this.heapArray[i].reduceFromNeighborhoodWeight(weightToReduce);
+        	HeapifyDown(i);
         }
         
         // @ pre -  size >= i > 0  &  size > 0
