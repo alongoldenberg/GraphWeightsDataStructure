@@ -16,7 +16,6 @@ public class Graph {
 
     private HashTable graphHashTable;
     private WeightHeap weightHeap;
-    private AdjacencyList adjacencyList;
     private int numEdges, numNodes;
 
 
@@ -90,8 +89,12 @@ public class Graph {
      * @return returns 'true' if the function deleted a node, otherwise returns 'false'
      */
     public boolean deleteNode(int node_id){
-        //TODO: implement this method.
-        return false;
+        Node nodeToDelete = graphHashTable.get(node_id);
+        adjencyNode adjency = nodeToDelete.adjencyNode;
+        while (adjency != null){
+            update_weight(adjency.connection_id);
+            adjency.remove_connection();
+        }
     }
     
     /**
@@ -114,10 +117,6 @@ public class Graph {
      * This class represents a node in the graph.
      */
     public static class Node{
-
-        int id;
-        int weight;
-
         /**
          * Creates a new node object, given its id and its weight.
          * @param id - the id of the node.
@@ -127,6 +126,7 @@ public class Graph {
     	int weight;
     	int neighborhood_weight;
     	int heapPointer;
+        public adjencyNode adjencyNode;
     	
         public Node(int id, int weight, int neighborhood_weight, int heapPointer){
             this.id = id;
