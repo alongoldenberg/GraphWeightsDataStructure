@@ -31,7 +31,6 @@ public class Graph {
       numNodes = nodes.length;
       this.graphHashTable = new HashTable(nodes);
       weightHeap = new WeightHeap(parseInputNodesForHeap(nodes));
-    
     }
     
     public Node[] parseInputNodesForHeap(Node[] nodes) {
@@ -102,10 +101,13 @@ public class Graph {
      */
     public boolean deleteNode(int node_id){
         Node nodeToDelete = graphHashTable.get(node_id);
-        adjencyNode adjency = nodeToDelete.adjencyNode;
+        int removedWeight = nodeToDelete.weight;
+        adjencyNode adjency = nodeToDelete.nodeAdjencies;
         while (adjency != null){
-            update_weight(adjency.connection_id);
-            adjency.remove_connection();
+            int neigbour_id = adjency.connection_id;
+            Node neighbour = graphHashTable.get(neigbour_id);
+            weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
+            neighbour.removeAdj(node_id);
         }
     }
     
@@ -201,6 +203,21 @@ public class Graph {
 
         public void setWeight(int weight) {
             this.weight = weight;
+        }
+
+        public void removeAdj(int adjToRemove){
+            adjencyNode adjency = this.nodeAdjencies;
+            if (adjency != null && adjency.connection_id == adjToRemove){
+                this.nodeAdjencies = adjency.next;
+                nodeAdjencies.next.prev = null;
+            }
+            adjency = adjency.next;
+            while(nodeAdjencies != null){
+                if(adjency.connection_id == adjToRemove){
+                    adjency.prev.next = adjency.next;
+                    adjency.next.prev = adjency.prev;
+                }
+            }
         }
 
     }
@@ -300,9 +317,14 @@ public class Graph {
         }
 
     }
-    
 
 
+
+    /**
+     * @author alongold
+     * This Class represents node adjency in a linked list format.
+     *
+     */
 
     public static class adjencyNode{
         private int connection_id;
@@ -433,8 +455,5 @@ public class Graph {
         	}
         }
     }
-    	
-    	
-   
 
 }
