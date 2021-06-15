@@ -17,6 +17,7 @@ public class Graph {
     private HashTable graphHashTable;
     private WeightHeap weightHeap;
     private AdjacencyList adjacencyList;
+    private int numEdges, numNodes;
 
 
     /**
@@ -26,9 +27,11 @@ public class Graph {
      * @param nodes - an array of node objects
      */
 
+
     public Graph(Node [] nodes){
+      numNodes = nodes.length;
       this.graphHashTable = new HashTable(nodes);
-    	Node[] heapNodes = parseInputNodesForHeap(nodes);
+     	Node[] heapNodes = parseInputNodesForHeap(nodes);
     	weightHeap = new WeightHeap(heapNodes);
     
     }
@@ -49,8 +52,7 @@ public class Graph {
      * @return a Node object representing the correct node. If there is no node in the graph, returns 'null'.
      */
     public Node maxNeighborhoodWeight(){
-        //TODO: implement this method.
-        return null;
+        return heapNodes[1];
     }
 
     /**
@@ -61,8 +63,9 @@ public class Graph {
      * Otherwise, the function returns -1.
      */
     public int getNeighborhoodWeight(int node_id){
-        //TODO: implement this method.
-        return 0;
+        Node node = graphHashTable.get(node_id);
+        if (node!=null){return node.neighborhood_weight;}
+        return -1;
     }
 
     /**
@@ -96,8 +99,7 @@ public class Graph {
      * @return the number of nodes in the graph.
      */
     public int getNumNodes(){
-        //TODO: implement this method.
-        return 0;
+        return numNodes;
     }
     
     /**
@@ -105,8 +107,7 @@ public class Graph {
      * @return the number of edges currently in the graph.
      */
     public int getNumEdges(){
-        //TODO: implement this method.
-        return 0;
+        return numEdges;
     }
 
     /**
@@ -190,8 +191,8 @@ public class Graph {
                 return ((a * node_id + b) % p) % n;
             }
 
-            private void insert(Node node) {
-                HashCell hashcell = new HashCell(node.getId(), node, null);
+            public void insert(Node node) {
+                HashCell hashcell = new HashCell(node, null);
                 int location = hash(node.getId());
                 if (hashTable[location] == null) {
                     hashTable[location] = hashcell;
@@ -204,33 +205,43 @@ public class Graph {
                 }
             }
 
-            private HashCell get(Node node){
-                int location = hash(node.getId());
+            public Node get(int node_id){
+                int location = hash(node_id);
                 if (hashTable[location] == null){return null;}
                 else{
                     HashCell candidate = hashTable[location];
                     while (candidate != null){
-                        if (candidate.getNode_id() == node.getId()){return candidate;}
+                        if (candidate.getNode_id() == node_id){return candidate.node;}
                         candidate = candidate.getNext();
                     }
                 }
                 return null;
             }
-
+            public void remove(int node_id){
+                int location = hash(node_id);
+                HashCell candidate = hashTable[location];
+                if (candidate == null){return;}
+                if (candidate.getNode_id() == node_id) {
+                    hashTable[location] = candidate.getNext();
+                    return;
+                }
+                while(candidate.getNext() != null){
+                    if(candidate.getNext().getNode_id() == node_id){
+                        candidate.setNext(candidate.getNext().getNext());
+                    }
+                }
+            }
     }
 
 
     
     private class HashCell{
-
-        public int node_id;
-        public Node heapPointer;
-        public AdjacencyList nodeAdjencies;
+        public Node node;
+        public adjencyNode nodeAdjencies;
         public HashCell next;
 
-        public HashCell(int node_id, Node heapPointer, AdjacencyList nodeAdjencies) {
-            this.node_id = node_id;
-            this.heapPointer = heapPointer;
+        public HashCell(Node node, adjencyNode nodeAdjencies) {
+            this.node = node;
             this.nodeAdjencies =  nodeAdjencies;
         }
 
@@ -241,15 +252,41 @@ public class Graph {
         public void setNext(HashCell next) {
             this.next = next;
         }
+
         public int getNode_id() {
-            return node_id;
+            return node.getId();
         }
 
     }
     
 
-    public class AdjacencyList{
 
+
+    public static class adjencyNode{
+        private int connection_id;
+        private adjencyNode next;
+        private adjencyNode prev;
+        private adjencyNode connection;
+
+        public adjencyNode(int connection_id) {
+            this.connection_id = connection_id;
+        }
+
+        public adjencyNode getNext() {
+            return next;
+        }
+
+        public void setNext(adjencyNode next) {
+            this.next = next;
+        }
+
+        public adjencyNode getPrev() {
+            return prev;
+        }
+
+        public void setPrev(adjencyNode prev) {
+            this.prev = prev;
+        }
     }
 
     /**
