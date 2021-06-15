@@ -26,15 +26,17 @@ public class Graph {
      * @param nodes - an array of node objects
      */
     public Graph(Node [] nodes){
-    	HeapNode[] heapNodes = parseInputNodesForHeap(nodes);
+    	Node[] heapNodes = parseInputNodesForHeap(nodes);
     	weightHeap = new WeightHeap(heapNodes);
+    	
     }
     
-    public HeapNode[] parseInputNodesForHeap(Node[] nodes) {
-    	HeapNode[] newNodeArr = new HeapNode[nodes.length+1];
+    public Node[] parseInputNodesForHeap(Node[] nodes) {
+    	Node[] newNodeArr = new Node[nodes.length+1];
     	newNodeArr[0] = null;
     	for (int i=0; i<nodes.length; i++) {
-    		newNodeArr[i+1] = new HeapNode(nodes[i], i+1);
+    		newNodeArr[i+1] = nodes[i];
+    		newNodeArr[i+1].setHeapPointer(i+1);
     	}
     	return newNodeArr;
     }
@@ -117,11 +119,21 @@ public class Graph {
     	int id;
     	int weight;
     	int neighborhood_weight;
+    	int heapPointer;
     	
-        public Node(int id, int weight, int neighborhood_weight){
+        public Node(int id, int weight, int neighborhood_weight, int heapPointer){
             this.id = id;
             this.weight = weight;
             this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = heapPointer;
+        }
+    	
+        public int getHeapPointer() {
+            return this.heapPointer;
+        }
+
+        public void setHeapPointer(int heapPointer) {
+            this.heapPointer = heapPointer;
         }
         
         public void addToNeighborhoodWeight(int weightToAdd) {
@@ -214,15 +226,15 @@ public class Graph {
      */
     
     public class WeightHeap{
-    	private HeapNode[] heapArray;
+    	private Node[] heapArray;
         private int size;
 
-        public WeightHeap(HeapNode[] heapNodes) { // node array in index 0 is not relevant. 
+        public WeightHeap(Node[] heapNodes) { // node array in index 0 is not relevant. 
             this.size = heapNodes.length -1; // because of comment above.
         	// Build heap:
-            this.heapArray = new HeapNode[heapNodes.length];
-            for (int i = heapNodes.length-1; i > 0; i--) {  // this loop go threw all vertexes layer by layer.
-            	if ((2*i) >= heapNodes.length) {
+            this.heapArray = heapNodes;
+            for (int i = heapArray.length-1; i > 0; i--) {  // this loop go threw all vertexes layer by layer.
+            	if ((2*i) > this.size) {
             		continue;
             	}
             	HeapifyDown(i);
@@ -241,6 +253,16 @@ public class Graph {
         	return (2*i);
         }
         
+        public void swap(int i, int j) {
+        	Node tmp = this.heapArray[i];
+        	this.heapArray[i] = this.heapArray[j];
+        	this.heapArray[j]= tmp;
+        	
+        	this.heapArray[i].setHeapPointer(i);
+        	this.heapArray[j].setHeapPointer(j);
+        	
+        }
+        
         public void HeapifyDown(int i) {
         	int left = leftSonIndex(i);
         	int right = rightSonIndex(i);
@@ -252,14 +274,7 @@ public class Graph {
         		largest = right;
         	}
         	if (largest > i) {
-        		
-        		HeapNode tmp = heapArray[i];
-        		heapArray[i] = heapArray[largest];
-        		heapArray[largest] = tmp;
-        		
-        		heapArray[i].setPointer(i);
-        		heapArray[largest].setPointer(largest);
-        		
+        		swap(i, largest);        		
         		HeapifyDown(largest);
         	}
         }
@@ -268,13 +283,7 @@ public class Graph {
         	int parent = parentIndex(i);
         	
         	if (parent > 0 && heapArray[i].neighborhood_weight > heapArray[parent].neighborhood_weight) {
-        		HeapNode tmp = heapArray[i];
-        		heapArray[i] = heapArray[parent];
-        		heapArray[parent] = tmp;
-        		
-        		heapArray[i].setPointer(i);
-        		heapArray[parent].setPointer(parent);
-        		
+        		swap(i, parent);
         		HeapifyUp(i);
         	}
         }
@@ -301,21 +310,6 @@ public class Graph {
     }
     	
     	
-    
-    public class HeapNode extends Node{
-        int pointer; // pointer to index at heap.
-    	
-        public HeapNode(Node node, int index) {
-        	super(node.id, node.weight, node.neighborhood_weight);
-        	this.pointer = index;
-    	}
-        public int getPointer() {
-            return this.pointer;
-        }
-
-        public void setPointer(int index) {
-            this.pointer = index;
-        }
-    }
+   
 
 }
