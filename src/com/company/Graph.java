@@ -16,7 +16,6 @@ public class Graph {
 
     private HashTable graphHashTable;
     private WeightHeap weightHeap;
-    private AdjacencyList adjacencyList;
     private int numEdges, numNodes;
 
 
@@ -31,8 +30,7 @@ public class Graph {
     public Graph(Node [] nodes){
       numNodes = nodes.length;
       this.graphHashTable = new HashTable(nodes);
-     	Node[] heapNodes = parseInputNodesForHeap(nodes);
-    	weightHeap = new WeightHeap(heapNodes);
+      weightHeap = new WeightHeap(parseInputNodesForHeap(nodes));
     
     }
     
@@ -52,7 +50,7 @@ public class Graph {
      * @return a Node object representing the correct node. If there is no node in the graph, returns 'null'.
      */
     public Node maxNeighborhoodWeight(){
-        return heapNodes[1];
+        return this.weightHeap.getMax();
     }
 
     /**
@@ -79,8 +77,21 @@ public class Graph {
      * @return returns 'true' if the function added an edge, otherwise returns 'false'.
      */
     public boolean addEdge(int node1_id, int node2_id){
-        //TODO: implement this method.
-        return false;
+    	if (!graphHashTable.containKey(node1_id) || !graphHashTable.containKey(node1_id)) {
+        	return false;
+        }
+    	Node node_1 = graphHashTable.get(node1_id);
+        Node node_2 = graphHashTable.get(node2_id);
+
+        //Adjencies update:
+        node_1.addToAdjencies(node_2);
+        node_2.addToAdjencies(node_1);
+        
+        //Heap update:
+        this.weightHeap.additionKey(node_1.heapPointer, node_2.getWeight());
+        this.weightHeap.additionKey(node_2.heapPointer, node_1.getWeight());
+        
+        return true;
     }
 
     /**
@@ -115,9 +126,6 @@ public class Graph {
      */
     public static class Node{
 
-        int id;
-        int weight;
-
         /**
          * Creates a new node object, given its id and its weight.
          * @param id - the id of the node.
@@ -127,14 +135,38 @@ public class Graph {
     	int weight;
     	int neighborhood_weight;
     	int heapPointer;
+    	public adjencyNode nodeAdjencies;
     	
+        public Node(int id, int weight, int neighborhood_weight, int heapPointer, adjencyNode nodeAdjencies){
+            this.id = id;
+            this.weight = weight;
+            this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = heapPointer;
+            this.nodeAdjencies =  nodeAdjencies;
+        }
+        
         public Node(int id, int weight, int neighborhood_weight, int heapPointer){
             this.id = id;
             this.weight = weight;
             this.neighborhood_weight = neighborhood_weight;
             this.heapPointer = heapPointer;
+            this.nodeAdjencies =  new adjencyNode(this); // initialize nodeAdjencies to be the node itself.
         }
-    	
+        
+        public Node(int id, int weight, int neighborhood_weight){
+            this.id = id;
+            this.weight = weight;
+            this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = 0; // no heap
+            this.nodeAdjencies =  new adjencyNode(this); // initialize nodeAdjencies to be the node itself.
+        }
+        
+        public void addToAdjencies(Node other) {
+        	adjencyNode otherToAdjNode = new adjencyNode(other);
+        	this.nodeAdjencies.addToStart(otherToAdjNode);
+        }
+        
+        
         public int getHeapPointer() {
             return this.heapPointer;
         }
@@ -166,6 +198,7 @@ public class Graph {
         public void setWeight(int weight) {
             this.weight = weight;
         }
+
     }
 
 
@@ -204,7 +237,12 @@ public class Graph {
                     collision.setNext(hashcell);
                 }
             }
-
+            
+            public boolean containKey(int i) {
+            	if (this.hashTable[i] == null) return false;
+            	else return true;
+            }
+            
             public Node get(int node_id){
                 int location = hash(node_id);
                 if (hashTable[location] == null){return null;}
@@ -271,7 +309,10 @@ public class Graph {
         public adjencyNode(int connection_id) {
             this.connection_id = connection_id;
         }
-
+        public adjencyNode(Node node) {
+            this.connection_id = node.id;
+        }
+        
         public adjencyNode getNext() {
             return next;
         }
@@ -286,6 +327,12 @@ public class Graph {
 
         public void setPrev(adjencyNode prev) {
             this.prev = prev;
+        }
+        
+        public void addToStart(adjencyNode adjNode) {
+        	adjNode.setNext(this);
+        	adjNode.setPrev(null);
+        	this.setPrev(adjNode);
         }
     }
 
@@ -356,6 +403,10 @@ public class Graph {
         		swap(i, parent);
         		HeapifyUp(i);
         	}
+        }
+        
+        public Node getMax() {
+        	return this.heapArray[1];
         }
         
         public void additionKey(int i, int weightToAdd) {
