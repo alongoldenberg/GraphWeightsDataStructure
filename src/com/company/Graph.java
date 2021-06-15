@@ -29,7 +29,9 @@ public class Graph {
      *
      * @param nodes - an array of node objects
      */
+
     public Graph(Node [] nodes){
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     	Node[] heapNodes = parseInputNodesForHeap(nodes);
     	weightHeap = new WeightHeap(heapNodes);
@@ -39,6 +41,12 @@ public class Graph {
       this.graphHashTable = new HashTable(nodes);
       this.weightHeap = new WeightHeap(parseInputNodesForHeap(nodes));
 >>>>>>> Stashed changes
+=======
+      this.graphHashTable = new HashTable(nodes);
+    	Node[] heapNodes = parseInputNodesForHeap(nodes);
+    	weightHeap = new WeightHeap(heapNodes);
+    
+>>>>>>> 4b2cca2e8ddbbbc9afe23aae0d85e8457e52e0e3
     }
     
     public Node[] parseInputNodesForHeap(Node[] nodes) {
@@ -138,6 +146,10 @@ public class Graph {
      * This class represents a node in the graph.
      */
     public static class Node{
+
+        int id;
+        int weight;
+
         /**
          * Creates a new node object, given its id and its weight.
          * @param id - the id of the node.
@@ -232,6 +244,7 @@ public class Graph {
             this.next = next;
         }
 
+<<<<<<< HEAD
         public adjencyNode getPrev() {
             return prev;
         }
@@ -246,8 +259,31 @@ public class Graph {
         }
         
     }
+=======
+        public class HashTable {
+            private HashCell[] hashTable;
+            private int p = 10 ^ 9 + 9;
+            private int n;
+            private int a;
+            private int b;
 
+            public HashTable(Node[] graph) {
+                this.n = graph.length;
+                this.hashTable = new HashCell[n];
+                Random r = new Random();
+                this.a = (int) (r.nextDouble() * p + 1);
+                this.b = (int) (r.nextDouble() * p);
+                for (Node node : graph) {
+                    insert(node);
+                }
+            }
+>>>>>>> 4b2cca2e8ddbbbc9afe23aae0d85e8457e52e0e3
 
+            private int hash(int node_id) {
+                return ((a * node_id + b) % p) % n;
+            }
+
+<<<<<<< HEAD
 
 <<<<<<< Updated upstream
 
@@ -274,6 +310,10 @@ public class Graph {
             
             public void insert(Node node) {
                 HashCell hashcell = new HashCell(node);
+=======
+            private void insert(Node node) {
+                HashCell hashcell = new HashCell(node.getId(), node, null);
+>>>>>>> 4b2cca2e8ddbbbc9afe23aae0d85e8457e52e0e3
                 int location = hash(node.getId());
                 if (hashTable[location] == null) {
                     hashTable[location] = hashcell;
@@ -284,6 +324,7 @@ public class Graph {
                     }
                     collision.setNext(hashcell);
                 }
+<<<<<<< HEAD
             }
 
             public boolean containKey(int i) {
@@ -317,26 +358,39 @@ public class Graph {
                     }
                 }
 >>>>>>> Stashed changes
+=======
+>>>>>>> 4b2cca2e8ddbbbc9afe23aae0d85e8457e52e0e3
             }
-        }
 
-        private int hash(int node_id){
-            return ((a*node_id + b) % p) % n;
-        }
-        
-        private void insert(Node node){
+            private HashCell get(Node node){
+                int location = hash(node.getId());
+                if (hashTable[location] == null){return null;}
+                else{
+                    HashCell candidate = hashTable[location];
+                    while (candidate != null){
+                        if (candidate.getNode_id() == node.getId()){return candidate;}
+                        candidate = candidate.getNext();
+                    }
+                }
+                return null;
+            }
 
-        }
     }
+
+
     
     private class HashCell{
+<<<<<<< HEAD
 <<<<<<< Updated upstream
+=======
+
+>>>>>>> 4b2cca2e8ddbbbc9afe23aae0d85e8457e52e0e3
         public int node_id;
-        public HeapNode heapPointer;
+        public Node heapPointer;
         public AdjacencyList nodeAdjencies;
         public HashCell next;
 
-        public HashCell(int node_id, HeapNode heapPointer, AdjacencyList nodeAdjencies) {
+        public HashCell(int node_id, Node heapPointer, AdjacencyList nodeAdjencies) {
             this.node_id = node_id;
             this.heapPointer = heapPointer;
             this.nodeAdjencies =  nodeAdjencies;
@@ -356,6 +410,10 @@ public class Graph {
         public void setNext(HashCell next) {
             this.next = next;
         }
+        public int getNode_id() {
+            return node_id;
+        }
+
     }
     
 
