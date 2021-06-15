@@ -26,17 +26,26 @@ public class Graph {
      *
      * @param nodes - an array of node objects
      */
-    public Graph(Node[] nodes){
-        numNodes = nodes.length;
-        this.graphHashTable = new HashTable(nodes);
-//        weightHeap = new WeightHeap();
-//        for(Node node: nodes){
-//            HeapNode heapNode = new HeapNode(node.node_id, node.weight);
-//            weightHeap.insert(heapNode);
-//
-//        }
-    }
 
+
+    public Graph(Node [] nodes){
+      numNodes = nodes.length;
+      this.graphHashTable = new HashTable(nodes);
+     	Node[] heapNodes = parseInputNodesForHeap(nodes);
+    	weightHeap = new WeightHeap(heapNodes);
+    
+    }
+    
+    public Node[] parseInputNodesForHeap(Node[] nodes) {
+    	Node[] newNodeArr = new Node[nodes.length+1];
+    	newNodeArr[0] = null;
+    	for (int i=0; i<nodes.length; i++) {
+    		newNodeArr[i+1] = nodes[i];
+    		newNodeArr[i+1].setHeapPointer(i+1);
+    	}
+    	return newNodeArr;
+    }
+    
     /**
      * This method returns the node in the graph with the maximum neighborhood weight.
      * Note: nodes that have been removed from the graph using deleteNode are no longer in the graph.
@@ -114,11 +123,30 @@ public class Graph {
          * @param id - the id of the node.
          * @param weight - the weight of the node.
          */
-        public Node(int id, int weight){
+    	int id;
+    	int weight;
+    	int neighborhood_weight;
+    	int heapPointer;
+    	
+        public Node(int id, int weight, int neighborhood_weight, int heapPointer){
             this.id = id;
             this.weight = weight;
+            this.neighborhood_weight = neighborhood_weight;
+            this.heapPointer = heapPointer;
+        }
+    	
+        public int getHeapPointer() {
+            return this.heapPointer;
         }
 
+        public void setHeapPointer(int heapPointer) {
+            this.heapPointer = heapPointer;
+        }
+        
+        public void addToNeighborhoodWeight(int weightToAdd) {
+        	this.neighborhood_weight += weightToAdd;
+        }
+        
         /**
          * Returns the id of the node.
          * @return the id of the node.
@@ -261,31 +289,97 @@ public class Graph {
         }
     }
 
+    /**
+     * 
+     * @author ofirn
+     * @pre nodeArray[0] is null. heap start from index 1.
+     */
+    
     public class WeightHeap{
+    	private Node[] heapArray;
+        private int size;
 
+        public WeightHeap(Node[] heapNodes) { // node array in index 0 is not relevant. 
+            this.size = heapNodes.length -1; // because of comment above.
+        	// Build heap:
+            this.heapArray = heapNodes;
+            for (int i = heapArray.length-1; i > 0; i--) {  // this loop go threw all vertexes layer by layer.
+            	if ((2*i) > this.size) {
+            		continue;
+            	}
+            	HeapifyDown(i);
+            }
+        }
 
+        public int parentIndex(int i) { // i is an index of heapArray 
+        	return Math.floorDiv(i, 2);
+        }
+        
+        public int rightSonIndex(int i) { // i is an index of heapArray 
+        	return (2*i)+1;
+        }
+        
+        public int leftSonIndex(int i) { // i is an index of heapArray 
+        	return (2*i);
+        }
+        
+        public void swap(int i, int j) {
+        	Node tmp = this.heapArray[i];
+        	this.heapArray[i] = this.heapArray[j];
+        	this.heapArray[j]= tmp;
+        	
+        	this.heapArray[i].setHeapPointer(i);
+        	this.heapArray[j].setHeapPointer(j);
+        	
+        }
+        
+        public void HeapifyDown(int i) {
+        	int left = leftSonIndex(i);
+        	int right = rightSonIndex(i);
+        	int largest = i;
+        	if (left < size && heapArray[left].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+        		largest = left;
+        	}
+        	if (right < size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+        		largest = right;
+        	}
+        	if (largest > i) {
+        		swap(i, largest);        		
+        		HeapifyDown(largest);
+        	}
+        }
+        
+        public void HeapifyUp(int i) {
+        	int parent = parentIndex(i);
+        	
+        	if (parent > 0 && heapArray[i].neighborhood_weight > heapArray[parent].neighborhood_weight) {
+        		swap(i, parent);
+        		HeapifyUp(i);
+        	}
+        }
+        
+        public void additionKey(int i, int weightToAdd) {
+        	this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
+        	HeapifyUp(i);
+        }
+        
+        // @ pre -  size >= i > 0  &  size > 0
+        public void deleteNodeByPosition(int i) {
+        	this.heapArray[i] = this.heapArray[size];
+        	this.size -= 1;
+        	if (heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
+        		HeapifyUp(i);
+        	}
+        	else if (heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+        		HeapifyDown(i);
+        	}
+        	else if (heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+        		HeapifyDown(i);
+        	}
+        }
     }
-
-    public class HeapNode{
-        private int node_id;
-        private int weightSum;
-
-        public HeapNode(int id, int weightSum) {
-            this.node_id = id;
-            this.weightSum = weightSum;
-        }
-
-        public int getNodeID() {
-            return node_id;
-        }
-
-        public int getWeight() {
-            return weightSum;
-        }
-
-        public void setWeightSum(int weight) {
-            this.weightSum = weight;
-        }
-    }
+    	
+    	
+   
 
 }
