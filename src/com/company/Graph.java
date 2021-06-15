@@ -107,6 +107,7 @@ public class Graph {
     public boolean deleteNode(int node_id){
         Node nodeToDelete = graphHashTable.get(node_id);
         if (nodeToDelete != null) {
+            this.numNodes--;
             int removedWeight = nodeToDelete.weight;
             adjencyNode adjency = nodeToDelete.nodeAdjencies;
             while (adjency != null) {
@@ -114,7 +115,9 @@ public class Graph {
                 Node neighbour = graphHashTable.get(neigbour_id);
                 weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
                 neighbour.removeAdj(node_id);
+                this.numEdges--;
             }
+
             return true;
         }
         return false;
