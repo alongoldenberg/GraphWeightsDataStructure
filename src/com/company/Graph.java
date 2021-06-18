@@ -174,24 +174,22 @@ public class Graph {
         }
 
         public Node(int id, int weight, int neighborhood_weight, int heapPointer) {
-            this(id, weight, neighborhood_weight, heapPointer, null);
+            this(id, weight, neighborhood_weight, heapPointer, new adjacencyNode());
 
         }
 
         public Node(int id, int weight, int neighborhood_weight) {
-            this(id, weight, neighborhood_weight, 0, null);
+            this(id, weight, neighborhood_weight, 0, new adjacencyNode());
         }
 
         public Node(int id, int weight) {
-            this(id, weight, weight, 0, null);
+            this(id, weight, weight, 0, new adjacencyNode());
         }
 
         // Add Node to this node Adjacency
         public void addToAdjacency(Node other) {
-            adjacencyNode otherToAdjNode = new adjacencyNode(other);
-            adjacencyNode temp = this.nodeAdjacency;
-            this.nodeAdjacency = otherToAdjNode;
-            otherToAdjNode.setNext(temp);
+        	adjacencyNode otherToAdjNode = new adjacencyNode(other.id);
+        	this.nodeAdjacency.addToStart(otherToAdjNode);
         }
 
         public boolean hasAdjacency(){
@@ -205,6 +203,14 @@ public class Graph {
         public void setHeapPointer(int heapPointer) {
             this.heapPointer = heapPointer;
         }
+        public int getNeighborhood_weight() {
+			return neighborhood_weight;
+		}
+
+		public void setNeighborhood_weight(int neighborhood_weight) {
+			this.neighborhood_weight = neighborhood_weight;
+		}
+        
 
         public void addToNeighborhoodWeight(int weightToAdd) {
             this.neighborhood_weight += weightToAdd;
@@ -262,7 +268,7 @@ public class Graph {
 
     public class HashTable {
         private HashCell[] hashTable;
-        private int p = 10 ^ 9 + 9;
+        private int p = (int) Math.pow(10, 9) + 9;
         private int n;
         private int a;
         private int b;
@@ -280,11 +286,13 @@ public class Graph {
         }
 
         private int hash(int node_id) {
-            return ((a * node_id + b) % p) % n;
+            return Math.floorMod(Math.floorMod((a * node_id + b) ,p) , n);
         }
 
         public boolean isEmpty() {
             return (this.fieldCells == 0);
+            
+            
         }
 
         public void insert(Node node) {
@@ -301,10 +309,7 @@ public class Graph {
             }
             this.fieldCells++;
         }
-        //#TODO : Ofir pay attention that this isn't accurate:
-        public boolean containKey(int i) {
-            return this.hashTable[i] != null;
-        }
+
 
         public Node get(int node_id) {
             int location = hash(node_id);
@@ -380,8 +385,14 @@ public class Graph {
 
         public adjacencyNode(int connection_id) {
             this.connection_id = connection_id;
+        }	
+        
+        public adjacencyNode() {
+        	this.next = null;
+        	this.prev = null;
+        	this.connection = null;
         }
-
+        
         public adjacencyNode(Node node) {
             this.connection_id = node.id;
         }
@@ -391,7 +402,13 @@ public class Graph {
         }
 
         public void setNext(adjacencyNode next) {
-            this.next = next;
+        	if (next == null) {
+            	this.next = null;
+            	return;
+            }
+        	this.next = next;
+        	this.next.connection = next;
+            this.next.connection_id = next.connection_id;
         }
 
         public adjacencyNode getPrev() {
@@ -399,13 +416,23 @@ public class Graph {
         }
 
         public void setPrev(adjacencyNode prev) {
-            this.prev = prev;
+            if (prev == null) {
+            	this.prev = null;
+            	return;
+            }
+        	this.prev = prev;
+        	this.prev.connection = prev;
+            this.prev.connection_id = prev.connection_id;
         }
 
         public void addToStart(adjacencyNode adjNode) {
-            adjNode.setNext(this);
-            adjNode.setPrev(null);
-            this.setPrev(adjNode);
+            if (this.connection == null) {
+            	this.connection = adjNode;
+            	this.connection_id = adjNode.connection_id; 
+            	return;
+            }
+            this.setNext(adjNode);
+            adjNode.setPrev(this); 
         }
     }
 
@@ -456,10 +483,10 @@ public class Graph {
             int left = leftSonIndex(i);
             int right = rightSonIndex(i);
             int largest = i;
-            if (left < size && heapArray[left].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+            if (left <= size && heapArray[left].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = left;
             }
-            if (right < size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+            if (right <= size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = right;
             }
             if (largest > i) {
@@ -473,7 +500,7 @@ public class Graph {
 
             if (parent > 0 && heapArray[i].neighborhood_weight > heapArray[parent].neighborhood_weight) {
                 swap(i, parent);
-                HeapifyUp(i);
+                HeapifyUp(parent);
             }
         }
 
@@ -496,7 +523,7 @@ public class Graph {
             // #TODO: Look closely at the following line: pay attention that it caused doubles
             this.heapArray[i] = this.heapArray[size];
             this.size -= 1;
-            if (heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
+            if (parentIndex(i) > 0 && heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
                 HeapifyUp(i);
             } else if (heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);

@@ -3,6 +3,9 @@ package com.company;
 public class Main {
 
     public static void main(String[] args) {
+    	for (int i=0 ; i<1000 ; i++) {
+    		
+    	
         Graph.Node node1 = new Graph.Node(1, 3);
         Graph.Node node2 = new Graph.Node(2, 5);
         Graph.Node node3 = new Graph.Node(3, 2);
@@ -21,7 +24,7 @@ public class Main {
         print("Adding Two nodes: 1->2, 1->3");
         graph.addEdge(1, 2);
         graph.addEdge(1, 3);
-        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getWeight());
+        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getNeighborhood_weight());
         print("Num of edges: " + graph.getNumEdges());
         print("deleted node 1:");
         graph.deleteNode(1);
@@ -37,11 +40,12 @@ public class Main {
 
 
     }
-
+    }
     public static void print(String text){
         System.out.println(text);
     }
     public static void print(int text){
         System.out.println(text);
     }
+    
 }
