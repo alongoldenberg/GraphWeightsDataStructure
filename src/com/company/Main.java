@@ -21,7 +21,7 @@ public class Main {
         print("Adding Two nodes: 1->2, 1->3");
         graph.addEdge(1, 2);
         graph.addEdge(1, 3);
-        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getWeight());
+        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getNeighborhood_weight());
         print("Num of edges: " + graph.getNumEdges());
         print("deleted node 1:");
         graph.deleteNode(1);
