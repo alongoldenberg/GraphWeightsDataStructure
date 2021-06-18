@@ -3,6 +3,9 @@ package com.company;
 public class Main {
 
     public static void main(String[] args) {
+    	for (int i=0 ; i<1000 ; i++) {
+    		
+    	
         Graph.Node node1 = new Graph.Node(1, 3);
         Graph.Node node2 = new Graph.Node(2, 5);
         Graph.Node node3 = new Graph.Node(3, 2);
@@ -37,11 +40,12 @@ public class Main {
 
 
     }
-
+    }
     public static void print(String text){
         System.out.println(text);
     }
     public static void print(int text){
         System.out.println(text);
     }
+    
 }

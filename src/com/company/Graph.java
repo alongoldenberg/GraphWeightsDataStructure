@@ -268,7 +268,7 @@ public class Graph {
 
     public class HashTable {
         private HashCell[] hashTable;
-        private int p = 10 ^ 9 + 9;
+        private int p = (int) Math.pow(10, 9) + 9;
         private int n;
         private int a;
         private int b;
@@ -286,11 +286,13 @@ public class Graph {
         }
 
         private int hash(int node_id) {
-            return ((a * node_id + b) % p) % n;
+            return Math.floorMod(Math.floorMod((a * node_id + b) ,p) , n);
         }
 
         public boolean isEmpty() {
             return (this.fieldCells == 0);
+            
+            
         }
 
         public void insert(Node node) {
@@ -307,10 +309,7 @@ public class Graph {
             }
             this.fieldCells++;
         }
-        //#TODO : Ofir pay attention that this isn't accurate:
-        public boolean containKey(int i) {
-            return this.hashTable[i] != null;
-        }
+
 
         public Node get(int node_id) {
             int location = hash(node_id);
