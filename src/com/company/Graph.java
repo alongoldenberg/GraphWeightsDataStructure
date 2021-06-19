@@ -94,6 +94,10 @@ public class Graph {
         node_1.addToAdjacency(node_2);
         node_2.addToAdjacency(node_1);
 
+        //Connect both new adjencyNodes. Pay attantion - adjency always add to beginning of the linked list.
+        node_1.nodeAdjacency.setNeighbour(node_2.nodeAdjacency);
+        node_2.nodeAdjacency.setNeighbour(node_1.nodeAdjacency);
+
         //Heap update:
         this.weightHeap.additionKey(node_1.heapPointer, node_2.getWeight());
         this.weightHeap.additionKey(node_2.heapPointer, node_1.getWeight());
@@ -116,15 +120,19 @@ public class Graph {
             int removedWeight = nodeToDelete.weight;
             adjacencyNode adjacency = nodeToDelete.nodeAdjacency;
             while (adjacency != null) {
-                int neighbor_id = adjacency.connection_id;
-                Node neighbour = graphHashTable.get(neighbor_id);
-                weightHeap.decreaseKey(neighbour.heapPointer, removedWeight);
-                neighbour.removeAdj(node_id);
+                adjacencyNode neighbourAdjency = adjacency.neighbour;
+                Node neighbourNode = neighbourAdjency.nodePointer;
+                if(neighbourNode.nodeAdjacency == neighbourAdjency){
+                    neighbourNode.nodeAdjacency = neighbourNode.nodeAdjacency.getNext();
+                }
+                neighbourAdjency.remove();
+
+                weightHeap.decreaseKey(neighbourNode.heapPointer, removedWeight);
                 this.numEdges--;
                 adjacency = adjacency.next;
             }
             this.weightHeap.deleteNodeByPosition(nodeToDelete.heapPointer);
-
+            this.graphHashTable.remove(node_id);
             return true;
         }
         return false;
@@ -174,22 +182,25 @@ public class Graph {
         }
 
         public Node(int id, int weight, int neighborhood_weight, int heapPointer) {
-            this(id, weight, neighborhood_weight, heapPointer, new adjacencyNode());
+            this(id, weight, neighborhood_weight, heapPointer, null);
 
         }
 
         public Node(int id, int weight, int neighborhood_weight) {
-            this(id, weight, neighborhood_weight, 0, new adjacencyNode());
+            this(id, weight, neighborhood_weight, 0, null);
         }
 
         public Node(int id, int weight) {
-            this(id, weight, weight, 0, new adjacencyNode());
+            this(id, weight, weight, 0, null);
         }
 
         // Add Node to this node Adjacency
         public void addToAdjacency(Node other) {
-        	adjacencyNode otherToAdjNode = new adjacencyNode(other.id);
-        	this.nodeAdjacency.addToStart(otherToAdjNode);
+        	adjacencyNode otherToAdjNode = new adjacencyNode(this, other.id);
+        	adjacencyNode temp = this.nodeAdjacency;
+        	this.nodeAdjacency = otherToAdjNode;
+        	this.nodeAdjacency.next = temp;
+        	if(temp!=null){temp.prev = this.nodeAdjacency;}
         }
 
         public boolean hasAdjacency(){
@@ -249,21 +260,6 @@ public class Graph {
 
 
 
-        public void removeAdj(int adjToRemove) {
-            adjacencyNode adjacency = this.nodeAdjacency;
-            if (adjacency != null && adjacency.connection_id == adjToRemove) {
-                this.nodeAdjacency = adjacency.next;
-                if(hasAdjacency()){adjacency.prev = null;}
-            }
-            adjacency = adjacency.next;
-            while (nodeAdjacency != null) {
-                if (adjacency.connection_id == adjToRemove) {
-                    adjacency.prev.next = adjacency.next;
-                    if(adjacency.next != null){adjacency.next.prev = adjacency.prev;}
-                }
-            }
-        }
-
     }
 
     public class HashTable {
@@ -272,7 +268,7 @@ public class Graph {
         private int n;
         private int a;
         private int b;
-        private int fieldCells;
+        private int filledCells;
 
         public HashTable(Node[] graph) {
             this.n = graph.length;
@@ -290,9 +286,7 @@ public class Graph {
         }
 
         public boolean isEmpty() {
-            return (this.fieldCells == 0);
-            
-            
+            return (this.filledCells == 0);
         }
 
         public void insert(Node node) {
@@ -307,7 +301,7 @@ public class Graph {
                 }
                 collision.setNext(hashcell);
             }
-            this.fieldCells++;
+            this.filledCells++;
         }
 
 
@@ -342,7 +336,7 @@ public class Graph {
                     candidate.setNext(candidate.getNext().getNext());
                 }
             }
-            this.fieldCells--;
+            this.filledCells--;
         }
     }
 
@@ -378,23 +372,46 @@ public class Graph {
      */
 
     public static class adjacencyNode {
-        private int connection_id;
+        private Node nodePointer;
+        private int neighbour_id;
         private adjacencyNode next;
         private adjacencyNode prev;
-        private adjacencyNode connection;
+        private adjacencyNode neighbour;
 
-        public adjacencyNode(int connection_id) {
-            this.connection_id = connection_id;
-        }	
-        
-        public adjacencyNode() {
-        	this.next = null;
-        	this.prev = null;
-        	this.connection = null;
+        public adjacencyNode(Node nodePointer, adjacencyNode neighbour, int neighbour_id, adjacencyNode next, adjacencyNode prev) {
+            this.nodePointer = nodePointer;
+            this.neighbour_id = neighbour_id;
+            this.next = next;
+            this.prev = prev;
+            this.neighbour = neighbour;
         }
-        
-        public adjacencyNode(Node node) {
-            this.connection_id = node.id;
+
+        public adjacencyNode(Node nodePointer, adjacencyNode neighbour, adjacencyNode next, adjacencyNode prev) {
+            this.nodePointer = nodePointer;
+            this.neighbour_id = neighbour.getNodePointer().id;
+            this.next = next;
+            this.prev = prev;
+            this.neighbour = neighbour;
+        }
+
+        public adjacencyNode(Node nodePointer, int neighbour_id) {
+            this(nodePointer, null, neighbour_id, null, null);
+        }
+
+        public Node getNodePointer() {
+            return nodePointer;
+        }
+
+        public void setNodePointer(Node nodePointer) {
+            this.nodePointer = nodePointer;
+        }
+
+        public adjacencyNode getNeighbour() {
+            return neighbour;
+        }
+
+        public void setNeighbour(adjacencyNode neighbour) {
+            this.neighbour = neighbour;
         }
 
         public adjacencyNode getNext() {
@@ -402,13 +419,7 @@ public class Graph {
         }
 
         public void setNext(adjacencyNode next) {
-        	if (next == null) {
-            	this.next = null;
-            	return;
-            }
         	this.next = next;
-        	this.next.connection = next;
-            this.next.connection_id = next.connection_id;
         }
 
         public adjacencyNode getPrev() {
@@ -416,24 +427,18 @@ public class Graph {
         }
 
         public void setPrev(adjacencyNode prev) {
-            if (prev == null) {
-            	this.prev = null;
-            	return;
-            }
-        	this.prev = prev;
-        	this.prev.connection = prev;
-            this.prev.connection_id = prev.connection_id;
+            this.prev = prev;
         }
 
-        public void addToStart(adjacencyNode adjNode) {
-            if (this.connection == null) {
-            	this.connection = adjNode;
-            	this.connection_id = adjNode.connection_id; 
-            	return;
+        public void remove(){
+            if (this.prev!=null){
+                this.prev.next = this.next;
             }
-            this.setNext(adjNode);
-            adjNode.setPrev(this); 
+            if (this.next!=null){
+                this.next.prev = this.prev;
+            }
         }
+
     }
 
     /**
