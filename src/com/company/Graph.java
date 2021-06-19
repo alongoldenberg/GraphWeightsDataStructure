@@ -99,8 +99,8 @@ public class Graph {
         node_2.nodeAdjacency.setNeighbour(node_1.nodeAdjacency);
 
         //Heap update:
-        this.weightHeap.additionKey(node_1.heapPointer, node_2.getWeight());
-        this.weightHeap.additionKey(node_2.heapPointer, node_1.getWeight());
+        this.weightHeap.increase(node_1.heapPointer, node_2.getWeight());
+        this.weightHeap.increase(node_2.heapPointer, node_1.getWeight());
 
         this.numEdges++;
 
@@ -414,7 +414,15 @@ public class Graph {
             this.neighbour = neighbour;
         }
 
-        public adjacencyNode getNext() {
+        public int getNeighbour_id() {
+			return neighbour_id;
+		}
+
+		public void setNeighbour_id(int neighbour_id) {
+			this.neighbour_id = neighbour_id;
+		}
+
+		public adjacencyNode getNext() {
             return next;
         }
 
@@ -513,7 +521,7 @@ public class Graph {
             return this.heapArray[1];
         }
 
-        public void additionKey(int i, int weightToAdd) {
+        public void increase(int i, int weightToAdd) {
             this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
             HeapifyUp(i);
         }
@@ -525,7 +533,6 @@ public class Graph {
 
         // @ pre -  size >= i > 0  &  size > 0
         public void deleteNodeByPosition(int i) {
-            // #TODO: Look closely at the following line: pay attention that it caused doubles
             this.heapArray[i] = this.heapArray[size];
             this.size -= 1;
             if (parentIndex(i) > 0 && heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
