@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.company.Graph.Node;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -25,12 +27,12 @@ public class Main {
         print("Adding Two nodes: 1->2, 1->3");
         graph.addEdge(1, 2);
         graph.addEdge(1, 3);
-        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getNeighborhood_weight());
+      //  print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getNeighborhood_weight());
         print("Num of edges: " + graph.getNumEdges());
         print("deleted node 1:");
         graph.deleteNode(1);
         print("Num of edges: " + graph.getNumEdges() + " == 0?");
-        print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getWeight());
+     //   print("Max Weight: " + graph.maxNeighborhoodWeight().id + " and weight is " + graph.maxNeighborhoodWeight().getWeight());
         print("\n");
 
         // Test Delete:
@@ -45,18 +47,24 @@ public class Main {
         for(int i=0;i<1000;i++){
             l.add(new Graph.Node(i, i));
         }
-
-        Graph bigGraph = new Graph((Graph.Node[]) l.toArray(new Graph.Node[0]));
+                
+        Graph.Node [] lstNodes = new Graph.Node[l.size()];
+        for (int j = 0 ; j< l.size(); j++) {
+        	lstNodes[j] = l.get(j);
+        }
+        Graph bigGraph = new Graph (lstNodes);
+        
         for(int i = 0;i<997;i+=2){
             bigGraph.addEdge(i, i+2);
         }
-        print("Max node is: " + bigGraph.maxNeighborhoodWeight());
+     //   print("Max node is: " + bigGraph.maxNeighborhoodWeight());
         print("Delete 11-999:");
         for(int i = 999;i>10;i--){
-            print(i);
-            bigGraph.deleteNode(i);
+            //print(i);
+        	bigGraph.deleteNode(i);
         }
         print("Max node is: " + bigGraph.maxNeighborhoodWeight());
+        print("DONE");
     }
     public static void print(String text){
         System.out.println(text);
