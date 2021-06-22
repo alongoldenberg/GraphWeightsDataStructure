@@ -507,10 +507,10 @@ public class Graph {
             int left = leftSonIndex(i);
             int right = rightSonIndex(i);
             int largest = i;
-            if (left < size && heapArray[left].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+            if (left <= size && heapArray[left].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = left;
             }
-            if (right < size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
+            if (right <= size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = right;
             }
             if (largest < i) {
@@ -553,10 +553,10 @@ public class Graph {
             if (parentIndex(i) > 0 && heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
                 HeapifyUp(i);
             } 
-            else if (leftSonIndex(i) < this.size && heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+            else if (leftSonIndex(i) <= this.size && heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
             } 
-            else if (rightSonIndex(i) < this.size && heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+            else if (rightSonIndex(i) <= this.size && heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
             }
         }
