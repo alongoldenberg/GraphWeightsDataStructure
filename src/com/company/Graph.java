@@ -48,10 +48,6 @@ public class Graph {
     }
 
     
-    public int test_MAXNumOfNodeInCell() {
-    	return this.graphHashTable.maxNodesInCellNum;
-    }
-    
     /**
      * This method returns the node in the graph with the maximum neighborhood weight.
      * Note: nodes that have been removed from the graph using deleteNode are no longer in the graph.
@@ -275,7 +271,6 @@ public class Graph {
         private int a;
         private int b;
         private int filledCells;
-        private int maxNodesInCellNum;
 
         public HashTable(Node[] graph) {
             this.n = graph.length;
@@ -311,13 +306,13 @@ public class Graph {
                     cnt += 1;
                 }
                 collision.setNext(hashcell);
-                maxNodesInCellNum = Integer.max(cnt, maxNodesInCellNum);
             }
             this.filledCells++;
         }
 
 
         public Node get(int node_id) {
+        	if (this.n==0) return null;
             int location = hash(node_id);
             if (hashTable[location] == null) {
                 return null;
@@ -550,14 +545,19 @@ public class Graph {
 
         // @ pre -  size >= i > 0  &  size > 0
         public void deleteNodeByPosition(int i) {
-            this.heapArray[i] = this.heapArray[size];
-            this.size -= 1;
+        	if (i == size) {
+        		size--;
+        		return;
+        	}
+        	swap(i, size);
+            size--;
             if (parentIndex(i) > 0 && heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
                 HeapifyUp(i);
-            } else if(leftSonIndex(i) > this.size){return;}
-            else if (heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+            } 
+            else if (leftSonIndex(i) <= this.size && heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
-            } else if (heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+            } 
+            else if (rightSonIndex(i) <= this.size && heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
             }
         }
