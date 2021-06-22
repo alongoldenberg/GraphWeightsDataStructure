@@ -6,10 +6,10 @@ public class measurements {
         Random rand = new Random();
         for (int i = 6; i < 22;i++) {
             int graphSize = (int) Math.pow(2, i);
-            print("i: " + i + "graph size: " + graphSize);
+            print("i: " + i + " graph size: " + graphSize);
             List<Graph.Node> l = new ArrayList<Graph.Node>();
             for (int j = 0; j < graphSize; j++) {
-                l.add(new Graph.Node(i, 1));
+                l.add(new Graph.Node(j, 1));
             }
             Graph bigGraph = new Graph((Graph.Node[]) l.toArray(new Graph.Node[0]));
             HashSet<Integer[]> edgesChecker =  new HashSet<>();
@@ -27,6 +27,7 @@ public class measurements {
             }
             print("Max node is: " + bigGraph.maxNeighborhoodWeight().id + " Weight is: "
                     + bigGraph.maxNeighborhoodWeight().getNeighborhood_weight());
+            print("\n");
 
         }
     }
