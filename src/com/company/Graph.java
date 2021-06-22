@@ -312,6 +312,7 @@ public class Graph {
 
 
         public Node get(int node_id) {
+        	if (this.n==0) return null;
             int location = hash(node_id);
             if (hashTable[location] == null) {
                 return null;
