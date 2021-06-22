@@ -57,6 +57,9 @@ public class Main {
             bigGraph.deleteNode(i);
         }
         print("Max node is: " + bigGraph.maxNeighborhoodWeight());
+
+
+
     }
     public static void print(String text){
         System.out.println(text);
