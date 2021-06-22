@@ -336,19 +336,24 @@ public class Graph {
         public void remove(int node_id) {
             int location = hash(node_id);
             HashCell candidate = hashTable[location];
+            // alreay removed
             if (candidate == null) {
                 return;
             }
+            // HashCell to remove is the first on the list
             if (candidate.getNode_id() == node_id) {
                 hashTable[location] = candidate.getNext();
+                if (hashTable[location] == null) {this.filledCells--;}
                 return;
             }
             while (candidate.getNext() != null) {
                 if (candidate.getNext().getNode_id() == node_id) {
                     candidate.setNext(candidate.getNext().getNext());
                 }
+                else{
+                    candidate = candidate.getNext();
+                }
             }
-            this.filledCells--;
         }
     }
 
@@ -549,7 +554,8 @@ public class Graph {
             this.size -= 1;
             if (parentIndex(i) > 0 && heapArray[i].neighborhood_weight > heapArray[parentIndex(i)].neighborhood_weight) {
                 HeapifyUp(i);
-            } else if (heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
+            } else if(leftSonIndex(i) > this.size){return;}
+            else if (heapArray[leftSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
             } else if (heapArray[rightSonIndex(i)].neighborhood_weight > heapArray[i].neighborhood_weight) {
                 HeapifyDown(i);
