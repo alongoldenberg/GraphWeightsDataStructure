@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /*
@@ -46,6 +47,11 @@ public class Graph {
         return newNodeArr;
     }
 
+    
+    public int test_MAXNumOfNodeInCell() {
+    	return this.graphHashTable.maxNodesInCellNum;
+    }
+    
     /**
      * This method returns the node in the graph with the maximum neighborhood weight.
      * Note: nodes that have been removed from the graph using deleteNode are no longer in the graph.
@@ -99,8 +105,8 @@ public class Graph {
         node_2.nodeAdjacency.setNeighbour(node_1.nodeAdjacency);
 
         //Heap update:
-        this.weightHeap.increase(node_1.heapPointer, node_2.getWeight());
-        this.weightHeap.increase(node_2.heapPointer, node_1.getWeight());
+        this.weightHeap.increaseKey(node_1.heapPointer, node_2.getWeight());
+        this.weightHeap.increaseKey(node_2.heapPointer, node_1.getWeight());
 
         this.numEdges++;
 
@@ -269,6 +275,7 @@ public class Graph {
         private int a;
         private int b;
         private int filledCells;
+        private int maxNodesInCellNum;
 
         public HashTable(Node[] graph) {
             this.n = graph.length;
@@ -296,10 +303,15 @@ public class Graph {
                 hashTable[location] = hashcell;
             } else {
                 HashCell collision = hashTable[location];
+                
+                int cnt = 0; 
+                
                 while (collision.getNext() != null) {
                     collision = collision.getNext();
+                    cnt += 1;
                 }
                 collision.setNext(hashcell);
+                maxNodesInCellNum = Integer.max(cnt, maxNodesInCellNum);
             }
             this.filledCells++;
         }
@@ -502,7 +514,7 @@ public class Graph {
             if (right <= size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = right;
             }
-            if (largest > i) {
+            if (largest < i) {
                 swap(i, largest);
                 HeapifyDown(largest);
             }
@@ -521,7 +533,7 @@ public class Graph {
             return this.heapArray[1];
         }
 
-        public void increase(int i, int weightToAdd) {
+        public void increaseKey(int i, int weightToAdd) {
             this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
             HeapifyUp(i);
         }
