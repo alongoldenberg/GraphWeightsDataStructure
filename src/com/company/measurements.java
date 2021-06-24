@@ -4,13 +4,15 @@ import java.util.*;
 public class measurements {
     public static void main(String args[]) {
         Random rand = new Random();
-        for (int i = 6; i < 22;i++) {
+        
+        for (int i = 5; i < 22;i++) {
             int graphSize = (int) Math.pow(2, i);
             print("i: " + i + " graph size: " + graphSize);
             List<Graph.Node> l = new ArrayList<Graph.Node>();
             for (int j = 0; j < graphSize; j++) {
                 l.add(new Graph.Node(j, 1));
             }
+            
             Graph bigGraph = new Graph((Graph.Node[]) l.toArray(new Graph.Node[0]));
             HashSet<Integer[]> edgesChecker =  new HashSet<>();
             int edgeNum = 0;

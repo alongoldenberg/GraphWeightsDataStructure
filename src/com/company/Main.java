@@ -9,6 +9,8 @@ import com.company.Graph.Node;
 public class Main {
 
     public static void main(String[] args) {
+    	testGraph();
+    	
     	print("Empty Graph:");
     	Graph empty_graph = new Graph(new Node[0]);
     	empty_graph.addEdge(1, 2);
@@ -106,4 +108,72 @@ public class Main {
         System.out.println(text);
     }
     
+    private static void testGraph() {
+
+        Graph graph = new Graph(new Graph.Node[0]);
+        assert graph.getNumEdges() == 0;
+        assert graph.getNumNodes() == 0;
+        assert graph.maxNeighborhoodWeight() == null;
+
+
+        graph = new Graph(new Graph.Node[] {
+                new Graph.Node(1, 0)
+        });
+        assert graph.getNumEdges() == 0;
+        assert graph.getNumNodes() == 1;
+        assert graph.maxNeighborhoodWeight().getId() == 1;
+        assert graph.maxNeighborhoodWeight().getWeight() == 0;
+
+
+        Graph.Node[] nodes = new Graph.Node[5];
+        for (int i = 0; i < 5; i++) {
+            nodes[i] = new Graph.Node(i, i);
+        }
+        graph = new Graph(nodes);
+        assert graph.getNumNodes() == 5;
+
+
+        assert !graph.addEdge(0, 12);
+        assert !graph.addEdge(0, 0);
+
+        assert graph.addEdge(2, 3);
+        assert graph.maxNeighborhoodWeight().getId() == 2 || graph.maxNeighborhoodWeight().getId() == 3;
+        assert graph.getNumEdges() == 1;
+        assert graph.getNeighborhoodWeight(0) == 0;
+        assert graph.getNeighborhoodWeight(1) == 1;
+        assert graph.getNeighborhoodWeight(2) == 5;
+        assert graph.getNeighborhoodWeight(3) == 5;
+        assert graph.getNeighborhoodWeight(4) == 4;
+
+        assert graph.addEdge(1, 2);
+        assert graph.maxNeighborhoodWeight().getId() == 2;
+        assert graph.getNumEdges() == 2;
+        assert graph.getNeighborhoodWeight(0) == 0;
+        assert graph.getNeighborhoodWeight(1) == 3;
+        assert graph.getNeighborhoodWeight(2) == 6;
+        assert graph.getNeighborhoodWeight(3) == 5;
+        assert graph.getNeighborhoodWeight(4) == 4;
+
+        assert graph.addEdge(3, 4);
+        assert graph.addEdge(1, 4);
+        assert graph.getNumEdges() == 4;
+        assert graph.maxNeighborhoodWeight().getId() == 3;
+        assert graph.getNeighborhoodWeight(0) == 0;
+        assert graph.getNeighborhoodWeight(1) == 7;
+        assert graph.getNeighborhoodWeight(2) == 6;
+        assert graph.getNeighborhoodWeight(3) == 9;
+        assert graph.getNeighborhoodWeight(4) == 8;
+
+        assert !graph.deleteNode(12);
+
+        assert graph.deleteNode(2);
+        assert !graph.deleteNode(2);
+        assert graph.getNumEdges() == 2;
+        assert graph.getNumNodes() == 4;
+        assert graph.getNeighborhoodWeight(0) == 0;
+        assert graph.getNeighborhoodWeight(1) == 5;
+        assert graph.getNeighborhoodWeight(3) == 7;
+        assert graph.getNeighborhoodWeight(4) == 8;
+        assert graph.maxNeighborhoodWeight().getId() == 4;
+    }
 }

@@ -529,7 +529,7 @@ public class Graph {
             if (right <= size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = right;
             }
-            if (largest < i) {
+            if (largest > i) {  // if largest is son of i then swap and heapify
                 swap(i, largest);
                 HeapifyDown(largest);
             }
@@ -545,6 +545,7 @@ public class Graph {
         }
 
         public Node getMax() {
+        	if (size < 1) return null;
             return this.heapArray[1];
         }
 
