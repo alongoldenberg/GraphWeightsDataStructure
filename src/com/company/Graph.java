@@ -282,7 +282,11 @@ public class Graph {
                 insert(node);
             }
         }
-
+        /**
+         * Calculate hash function for a node id.
+         *
+         * @return int represting the output of the hash function.
+         */
         private int hash(int node_id) {
             return Math.floorMod(Math.floorMod((a * node_id + b) ,p) , n);
         }
@@ -291,6 +295,11 @@ public class Graph {
             return (this.filledCells == 0);
         }
 
+        /**
+         * Inserts a given node into the hashtable.
+         *
+         * @pre: node isn't already in the hash table.
+         */
         public void insert(Node node) {
             HashCell hashcell = new HashCell(node, null);
             int location = hash(node.getId());
@@ -310,7 +319,11 @@ public class Graph {
             this.filledCells++;
         }
 
-
+        /**
+         * Searches and returns the given node by id.
+         *
+         * @return a pointer to the requested node, or null if it's not in the hashtable.
+         */
         public Node get(int node_id) {
         	if (this.n==0) return null;
             int location = hash(node_id);
@@ -327,7 +340,9 @@ public class Graph {
             }
             return null;
         }
-
+        /**
+         * Removes the node from the hashtable.
+         */
         public void remove(int node_id) {
             int location = hash(node_id);
             HashCell candidate = hashTable[location];
