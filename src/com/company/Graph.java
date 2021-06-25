@@ -204,11 +204,11 @@ public class Graph {
         	this.nodeAdjacency.next = temp;
         	if(temp!=null){temp.prev = this.nodeAdjacency;}
         }
-
+        // check if this node has Adjacency (if it has neighbors)
         public boolean hasAdjacency(){
             return this.nodeAdjacency != null;
         }
-
+        
         public int getHeapPointer() {
             return this.heapPointer;
         }
@@ -216,6 +216,7 @@ public class Graph {
         public void setHeapPointer(int heapPointer) {
             this.heapPointer = heapPointer;
         }
+        
         public int getNeighborhood_weight() {
 			return neighborhood_weight;
 		}
@@ -224,11 +225,20 @@ public class Graph {
 			this.neighborhood_weight = neighborhood_weight;
 		}
         
-
+		/**
+		 * Add weight to the neighborhood_weight of this node
+		 * @param int weightToAdd
+		 * @post this node neighborhood_weight increased by weightToAdd.
+		 */
         public void addToNeighborhoodWeight(int weightToAdd) {
             this.neighborhood_weight += weightToAdd;
         }
 
+        /**
+		 * Reduce weight from the neighborhood_weight of this node
+		 * @param int weightToReduce
+		 * @post this node neighborhood_weight decreased by weightToReduce.
+		 */
         public void reduceFromNeighborhoodWeight(int weightToReduce) {
             this.neighborhood_weight -= weightToReduce;
         }
@@ -263,7 +273,10 @@ public class Graph {
 
 
     }
-
+    
+	/**
+	 * This class represents Hash Map from node_id to node using chaining and universal hashing.
+	 */
     public class HashTable {
         private HashCell[] hashTable;
         private int p = (int) Math.pow(10, 9) + 9;
@@ -272,6 +285,9 @@ public class Graph {
         private int b;
         private int filledCells;
 
+        /**
+         * HashTable constructor - get an Array of n nodes which are part of the graph and insert them to the HashTable.
+         * */
         public HashTable(Node[] graph) {
             this.n = graph.length;
             this.hashTable = new HashCell[n];
@@ -284,13 +300,16 @@ public class Graph {
         }
         /**
          * Calculate hash function for a node id.
-         *
-         * @return int represting the output of the hash function.
+         * @return int represents the output of the hash function.
          */
         private int hash(int node_id) {
             return Math.floorMod(Math.floorMod((a * node_id + b) ,p) , n);
         }
-
+        
+        /**
+         * check if the HashTable is empty.
+         * @return true if there are no items in the HashTable. else, return false
+         */
         public boolean isEmpty() {
             return (this.filledCells == 0);
         }
@@ -301,18 +320,15 @@ public class Graph {
          * @pre: node isn't already in the hash table.
          */
         public void insert(Node node) {
-            HashCell hashcell = new HashCell(node, null);
+            HashCell hashcell = new HashCell(node);
             int location = hash(node.getId());
             if (hashTable[location] == null) {
                 hashTable[location] = hashcell;
             } else {
                 HashCell collision = hashTable[location];
-                
-                int cnt = 0; 
-                
+                            
                 while (collision.getNext() != null) {
-                    collision = collision.getNext();
-                    cnt += 1;
+                    collision = collision.getNext();    
                 }
                 collision.setNext(hashcell);
             }
@@ -367,17 +383,19 @@ public class Graph {
         }
     }
 
-
+    /**
+     * This class represents linked list of nodes which share the same HashTable cell. 
+     * This class enable to deal with collisions using chaining.
+     */
     private class HashCell {
         public Node node;
-        public adjacencyNode nodeAdjacency;
         public HashCell next;
 
-        public HashCell(Node node, adjacencyNode nodeAdjacency) {
+        //constructor
+        public HashCell(Node node) {
             this.node = node;
-            this.nodeAdjacency = nodeAdjacency;
         }
-
+    
         public HashCell getNext() {
             return next;
         }
@@ -394,7 +412,7 @@ public class Graph {
 
 
     /**
-     * @author alongold
+     * 
      * This Class represents node adjency in a linked list format.
      */
 
@@ -477,14 +495,19 @@ public class Graph {
     }
 
     /**
-     * @author ofirn
-     * nodeArray[0] is null. heap start from index 1.
+     * This class represents max heap of nodes. The key is the neighborhood_weight of each node.
+     * The heap is implemented by an array of nodes. 
+     * First position of the array (index 0) is set to be null (the heap root in index 1).
      */
 
     public static class WeightHeap {
         private Node[] heapArray;
         private int size;
 
+        /**
+         * WeightHeap constructor - get an Array of n nodes which are part of the graph and insert them to the WeightHeap using HeapifyDown operations.
+         * @pre - First position of heapNodes array is null. Other positions contain nodes of the graph.
+         */
         public WeightHeap(Node[] heapNodes) { // node array in index 0 is not relevant. 
             this.size = heapNodes.length - 1; // because of comment above.
             // Build heap:
@@ -496,19 +519,36 @@ public class Graph {
                 HeapifyDown(i);
             }
         }
-
+        
+        /**
+         * @param i - index of an object in heapArray
+         * @return parent index of i
+         */
         public int parentIndex(int i) { // i is an index of heapArray 
             return Math.floorDiv(i, 2);
         }
 
+        /**
+         * @param i - index of an object in heapArray
+         * @return right son index of i
+         */
         public int rightSonIndex(int i) { // i is an index of heapArray 
             return (2 * i) + 1;
         }
-
+        
+        /**
+         * @param i - index of an object in heapArray
+         * @return left son index of i
+         */
         public int leftSonIndex(int i) { // i is an index of heapArray 
             return (2 * i);
         }
-
+        
+        /**
+         * @param i - index of an object in heapArray
+         * @param j - index of another object in heapArray
+         * @post - swap positions of nodes in indexes i and j.
+         */
         public void swap(int i, int j) {
             Node tmp = this.heapArray[i];
             this.heapArray[i] = this.heapArray[j];
@@ -518,7 +558,11 @@ public class Graph {
             this.heapArray[j].setHeapPointer(j);
 
         }
-
+        /**
+         * HeapifyDown maintains the structure and the order of the heap recursively. 
+         * At each recursive call, this operation makes sure that the key of node in position i, is larger then its children.
+         * @post legal max heap. 
+         */
         public void HeapifyDown(int i) {
             int left = leftSonIndex(i);
             int right = rightSonIndex(i);
@@ -529,12 +573,17 @@ public class Graph {
             if (right <= size && heapArray[right].neighborhood_weight > heapArray[largest].neighborhood_weight) {
                 largest = right;
             }
-            if (largest < i) {
+            if (largest > i) {  // if largest is son of i then swap and heapify
                 swap(i, largest);
                 HeapifyDown(largest);
             }
         }
-
+        
+        /**
+         * HeapifyUp maintains the structure and the order of the heap recursively. 
+         * At each recursive call, this operation makes sure that the key of node in position i, is smaller then its parent.
+         * @post legal max heap. 
+         */
         public void HeapifyUp(int i) {
             int parent = parentIndex(i);
 
@@ -543,22 +592,42 @@ public class Graph {
                 HeapifyUp(parent);
             }
         }
-
+        /**
+         * @pre heapArray is a legal heap in which the node with the maximal key is at index 1 (if it is not empty).
+         * @return node with maximal key.
+         */
         public Node getMax() {
+        	if (size < 1) return null;
             return this.heapArray[1];
         }
-
+        
+        /**
+         * increaseKey operation change the key of the node in position i and then uses HeapifyUp operation to maintains a legal heap.
+         * @post node in position i increased its key by weightToAdd.
+         * @post heapArray represents a legal max heap.
+         */
         public void increaseKey(int i, int weightToAdd) {
             this.heapArray[i].addToNeighborhoodWeight(weightToAdd);
             HeapifyUp(i);
         }
 
+        /**
+         * decreaseKey operation change the key of the node in position i and then uses HeapifyDown operation to maintains a legal heap.
+         * @post node in position i decreased its key by weightToReduce.
+         * @post heapArray represents a legal max heap.
+         */
         public void decreaseKey(int i, int weightToReduce) {
             this.heapArray[i].reduceFromNeighborhoodWeight(weightToReduce);
             HeapifyDown(i);
         }
 
-        // @ pre -  size >= i > 0  &  size > 0
+        /**
+         * deleteNodeByPosition(int i) 
+         * removes node in position i from the heap. then, uses HeapifyUp or HeapifyDown in order to maintains a legal heap.
+         * @pre size >= i > 0  &  size > 0
+         * @post the node that was in position i has been removed from heap.
+         * @post heapArray represents a legal max heap.
+         */
         public void deleteNodeByPosition(int i) {
         	if (i == size) {
         		size--;
